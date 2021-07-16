@@ -1,30 +1,23 @@
-import React from "react";
-
+import React, { useState, setState } from "react";
 
 import Input from "./Input";
 
-class Converter extends React.Component {
-  constructor(props) {
-    super(props);
+const Converter = (props) => {
+  const [value, setValue] = useState("💩");
+  const [from, setFrom] = useState("emoji");
 
-    this.handleEmojiToIpv4 = this.handleEmojiToIpv4.bind(this);
-    this.handleIpv4ToEmoji = this.handleIpv4ToEmoji.bind(this);
-    this.convertEmojiToIpv4 = this.convertEmojiToIpv4.bind(this);
-    this.convertIpv4ToEmoji = this.convertIpv4ToEmoji.bind(this);
-
-    this.state = {value: "💩", from: "emoji", to: "ipv4"}
+  const handleEmojiToIpv4 = (value) => {
+    setValue(value);
+    setFrom("emoji");
   }
 
-  handleEmojiToIpv4(value) {
-    this.setState({value: value, from: "emoji", to: "ipv4"});
+  const handleIpv4ToEmoji = (value) => {
+    setValue(value);
+    setFrom("ipv4");
   }
 
-  handleIpv4ToEmoji(value) {
-    this.setState({value: value, from: "ipv4", to: "emoji"});
-  }
-
-  convertEmojiToIpv4() {
-    let encoded = encodeURIComponent(this.state.value);
+  const convertEmojiToIpv4 = () => {
+    let encoded = encodeURIComponent(value);
     let hexArray = encoded.split("%").filter(e => e);
     let decArray = [];
 
@@ -36,8 +29,8 @@ class Converter extends React.Component {
     return decArray.join(".");
   }
 
-  convertIpv4ToEmoji() {
-    let ipv4 = this.state.value;
+  const convertIpv4ToEmoji = () => {
+    let ipv4 = value;
     let decArray = ipv4.split(".").filter(e => e).map(e => parseInt(e));
 
     if (decArray.length < 3) return "";
@@ -61,21 +54,12 @@ class Converter extends React.Component {
     return emoji;
   }
 
-  render() {
-    const value = this.state.value;
-    const from = this.state.from;
-    const to = this.state.to;
-
-    const emoji = from === "ipv4" && to === "emoji" ? this.convertIpv4ToEmoji() : value;
-    const ipv4 = from === "emoji" && to === "ipv4" ? this.convertEmojiToIpv4() : value;
-
-    return (
-      <form>
-        <Input value={emoji} htmlFor="emoji" label="from emoji to ipv4" onChange={this.handleEmojiToIpv4} />
-        <Input value={ipv4} htmlFor="ipv4" label="from ipv4 to emoji" onChange={this.handleIpv4ToEmoji} />
-      </form>
-    )
-  }
+  return (
+    <form>
+      <Input value={from === "ipv4" ? convertIpv4ToEmoji() : value} htmlFor="emoji" label="from emoji to ipv4" onChange={handleEmojiToIpv4} />
+      <Input value={from === "emoji" ? convertEmojiToIpv4() : value} htmlFor="ipv4" label="from ipv4 to emoji" onChange={handleIpv4ToEmoji} />
+    </form>
+  )
 }
 
 export default Converter
